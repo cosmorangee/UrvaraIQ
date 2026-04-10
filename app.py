@@ -309,15 +309,6 @@ def chatbot_response(query):
 
     return " ".join(response_parts)
 
-@app.route("/")
-def home():
-    return render_template("home.html")
-
-@app.route("/")
-def home():
-    print("HOME ROUTE WORKING")
-    return render_template("home.html")
-
 @app.route("/assistant", methods=["GET", "POST"])
 def assistant():
     chat_reply = None
