@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box store-box">
+        <h1 class="page-title">SMART AGRICULTURE STORE</h1>
+        <p class="page-subtitle">Tools, fertilizers, and essentials for modern farming.</p>
+
+        <div class="store-container">
+            <div class="products">
+                <div class="product-card">
+                    <h3>Shovel</h3>
+                    <p>₹500</p>
+                    <button onclick="addToCart('Shovel', 500)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Hoe</h3>
+                    <p>₹450</p>
+                    <button onclick="addToCart('Hoe', 450)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Watering Can</h3>
+                    <p>₹300</p>
+                    <button onclick="addToCart('Watering Can', 300)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Sprayer</h3>
+                    <p>₹1200</p>
+                    <button onclick="addToCart('Sprayer', 1200)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Urea Fertilizer</h3>
+                    <p>₹800</p>
+                    <button onclick="addToCart('Urea Fertilizer', 800)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>DAP Fertilizer</h3>
+                    <p>₹750</p>
+                    <button onclick="addToCart('DAP Fertilizer', 750)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Organic Compost</h3>
+                    <p>₹600</p>
+                    <button onclick="addToCart('Organic Compost', 600)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Seeds Pack</h3>
+                    <p>₹200</p>
+                    <button onclick="addToCart('Seeds Pack', 200)">Add</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Oil Cake</h3>
+                    <p>₹400</p>
+                    <button onclick="addToCart('Oil Cake', 400)">Add</button>
+                </div>
+            </div>
+
+            <div class="cart-panel">
+                <h3>🛒 Shopping Cart</h3>
+                <ul id="cartItems"></ul>
+
+                <div class="total">
+                    Total: ₹<span id="total">0</span>
+                </div>
+
+                <button onclick="checkout()">Proceed to Payment</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box">
+        <h1 class="page-title">FARMER ASSISTANT</h1>
+        <p class="page-subtitle">Ask a farming question and hear the reply.</p>
+
+        <form method="POST" class="form-box">
+            <input type="text" name="chat" placeholder="Ask about irrigation, fertilizer, disease..." required>
+            <button type="submit">ASK</button>
+        </form>
+
+        {% if chat_reply %}
+        <div class="chat-box">
+            <h3>Assistant Reply</h3>
+            <p id="chatReply">{{ chat_reply }}</p>
+            <br>
+            <button onclick="speakText(document.getElementById('chatReply').innerText)">HEAR REPLY</button>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box">
+        <h1 class="page-title">CROP ANALYZER</h1>
+        <p class="page-subtitle">Enter crop and city to get weather-based farming recommendations.</p>
+
+        <form method="POST" class="form-box">
+            <input type="text" name="place" placeholder="Enter village / town / city / district">
+
+            <select name="crop">
+                <option>Wheat</option>
+                <option>Rice</option>
+                <option>Maize</option>
+                <option>Cotton</option>
+                <option>Sugarcane</option>
+            </select>
+
+            <input type="hidden" id="lat" name="lat">
+            <input type="hidden" id="lon" name="lon">
+
+            <button type="button" onclick="getLocation()">USE MY LOCATION</button>
+            <button type="submit">ANALYZE</button>
+        </form>
+
+        {% if error %}
+        <div class="chat-box">
+            <h3>Error</h3>
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="result-grid">
+            <div class="result-card">
+                <h3>Location</h3>
+                <p>{{ result.place }}, {{ result.state }}, {{ result.country }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Crop</h3>
+                <p>{{ result.crop }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Latitude</h3>
+                <p>{{ result.lat }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Longitude</h3>
+                <p>{{ result.lon }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Temperature</h3>
+                <p>{{ result.temp }} °C</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Humidity</h3>
+                <p>{{ result.humidity }} %</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Weather</h3>
+                <p>{{ result.weather_desc }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Wind Speed</h3>
+                <p>{{ result.wind_speed }} m/s</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Irrigation</h3>
+                <p>{{ result.irrigation }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Disease Risk</h3>
+                <p>{{ result.disease }}</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Fertilizer</h3>
+                <p>{{ result.fertilizer }}</p>
+            </div>
+
+            <div class="result-card full">
+                <h3>Alert</h3>
+                <p>{{ result.alert }}</p>
+                <br>
+                <button onclick="speakText('{{ result.alert }}')">PLAY ALERT</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

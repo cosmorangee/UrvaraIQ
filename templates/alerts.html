@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box">
+        <h1 class="page-title">ALERTS DASHBOARD</h1>
+        <p class="page-subtitle">Important environmental and crop alerts.</p>
+
+        <div class="cards-grid">
+            {% for alert in alerts %}
+            <div class="alert-card">
+                <h3>Alert</h3>
+                <p>{{ alert }}</p>
+                <br>
+                <button onclick="speakText('{{ alert }}')">PLAY</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrvaraIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🌿</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">HOME</a></li>
+            <li><a href="{{ url_for('analyzer') }}">ANALYZER</a></li>
+            <li><a href="{{ url_for('assistant') }}">ASSISTANT</a></li>
+            <li><a href="{{ url_for('alerts') }}">ALERTS</a></li>
+            <li><a href="{{ url_for('store') }}">STORE</a></li>
+            <li><a href="{{ url_for('about') }}">ABOUT</a></li>
+        </ul>
+        <a href="{{ url_for('assistant') }}" class="nav-btn">GET IN TOUCH</a>
+    </nav>
+
+    {% block content %}{% endblock %}
+</body>
+</html>

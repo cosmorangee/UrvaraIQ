@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <p class="hero-subtitle">SMART AGRICULTURE PLATFORM</p>
+        <h1>URVARAIQ</h1>
+        <h2>AI DRIVEN FARMING ASSISTANT</h2>
+
+        <div class="hero-buttons">
+            <a href="{{ url_for('analyzer') }}" class="gold-btn">DISCOVER</a>
+            <a href="{{ url_for('assistant') }}" class="outline-btn">GET IN TOUCH</a>
+        </div>
+    </div>
+</section>
+
+<section class="below-section">
+    <div class="info-left">
+        <h2>Smart Farm Ecology Products</h2>
+    </div>
+    <div class="info-right">
+        <p>
+            UrvaraIQ helps farmers make better decisions using weather insights,
+            irrigation recommendations, disease alerts, and smart AI support.
+        </p>
+        <p>
+            The platform is designed to improve yield, reduce resource waste,
+            and make precision farming easy and accessible.
+        </p>
+    </div>
+</section>
+{% endblock %}
