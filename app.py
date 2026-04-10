@@ -313,6 +313,11 @@ def chatbot_response(query):
 def home():
     return render_template("home.html")
 
+@app.route("/")
+def home():
+    print("HOME ROUTE WORKING")
+    return render_template("home.html")
+
 @app.route("/assistant", methods=["GET", "POST"])
 def assistant():
     chat_reply = None
@@ -342,4 +347,4 @@ def store():
     return render_template("store.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(debug=True)
