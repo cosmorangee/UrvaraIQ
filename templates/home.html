@@ -3,20 +3,20 @@
 {% block content %}
 <section class="hero-section">
     <div class="hero-overlay"></div>
+    <div class="particles" id="particles"></div>
 
-    <div class="hero-content">
-        <p class="hero-subtitle">SMART AGRICULTURE PLATFORM</p>
-        <h1>URVARAIQ</h1>
-        <h2>AI DRIVEN FARMING ASSISTANT</h2>
+    <div class="hero-center">
+        <h1 class="hero-logo">URVARA<span>IQ</span></h1>
+        <p class="hero-subtitle-large">AI DRIVEN FARMING ASSISTANT</p>
 
         <div class="hero-buttons">
-            <a href="{{ url_for('analyzer') }}" class="gold-btn">DISCOVER</a>
+            <a href="{{ url_for('analyzer') }}" class="gold-btn pulse">DISCOVER</a>
             <a href="{{ url_for('assistant') }}" class="outline-btn">GET IN TOUCH</a>
         </div>
     </div>
 </section>
 
-<section class="below-section">
+<section class="below-section reveal">
     <div class="info-left">
         <h2>Smart Farm Ecology Products</h2>
     </div>

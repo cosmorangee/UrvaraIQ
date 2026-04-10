@@ -8,6 +8,28 @@
         <h1 class="page-title">SENSOR DASHBOARD</h1>
         <p class="page-subtitle">Simulated field sensor values for smart farming decisions.</p>
 
+        <div class="preset-row">
+            <form method="POST">
+                <input type="hidden" name="preset" value="dry">
+                <button type="submit">Dry Field</button>
+            </form>
+
+            <form method="POST">
+                <input type="hidden" name="preset" value="rainy">
+                <button type="submit">Rainy Day</button>
+            </form>
+
+            <form method="POST">
+                <input type="hidden" name="preset" value="disease">
+                <button type="submit">High Disease Risk</button>
+            </form>
+
+            <form method="POST">
+                <input type="hidden" name="preset" value="healthy">
+                <button type="submit">Healthy Field</button>
+            </form>
+        </div>
+
         <form method="POST" class="sensor-form">
             <div class="sensor-grid">
                 <div class="sensor-input-card">
@@ -44,32 +66,29 @@
             </div>
         </form>
 
-        <div class="result-grid" style="margin-top: 30px;">
-            <div class="result-card">
-                <h3>Soil Moisture</h3>
-                <p>{{ sensor_data.soil_moisture }} %</p>
-            </div>
+        <div class="result-card sensor-status {{ status_classes.soil_moisture }}">
+    <h3>Soil Moisture</h3>
+    <p class="counter" data-target="{{ sensor_data.soil_moisture }}">0</p>
+    <p>%</p>
+</div>
 
-            <div class="result-card">
-                <h3>Field Temperature</h3>
-                <p>{{ sensor_data.field_temperature }} °C</p>
-            </div>
+<div class="result-card sensor-status {{ status_classes.field_temperature }}">
+    <h3>Field Temperature</h3>
+    <p class="counter" data-target="{{ sensor_data.field_temperature }}">0</p>
+    <p>°C</p>
+</div>
 
-            <div class="result-card">
-                <h3>Field Humidity</h3>
-                <p>{{ sensor_data.field_humidity }} %</p>
-            </div>
+<div class="result-card sensor-status {{ status_classes.field_humidity }}">
+    <h3>Field Humidity</h3>
+    <p class="counter" data-target="{{ sensor_data.field_humidity }}">0</p>
+    <p>%</p>
+</div>
 
-            <div class="result-card">
-                <h3>Rain Detected</h3>
-                <p>{{ sensor_data.rain_detected }}</p>
-            </div>
-
-            <div class="result-card">
-                <h3>Soil pH</h3>
-                <p>{{ sensor_data.soil_ph }}</p>
-            </div>
-        </div>
+<div class="result-card sensor-status {{ status_classes.soil_ph }}">
+    <h3>Soil pH</h3>
+    <p class="counter" data-target="{{ sensor_data.soil_ph }}">0</p>
+</div>
+</div>
 
         <div class="chat-box" style="margin-top: 30px;">
             <h3>Sensor-Based Advice</h3>
@@ -79,6 +98,112 @@
                 {% endfor %}
             </div>
         </div>
+<div class="chart-box" style="margin-top: 30px;">
+    <h3>Live Sensor Chart</h3>
+    <div class="chart-wrapper">
+        <canvas id="sensorChart"></canvas>
+    </div>
+</div>
     </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const sensorChart = document.getElementById('sensorChart');
+
+    new Chart(sensorChart, {
+        type: 'bar',
+        data: {
+            labels: ['Soil Moisture', 'Temperature', 'Humidity', 'Soil pH'],
+            datasets: [{
+                label: 'Field Sensor Values',
+                data: [
+                    {{ sensor_data.soil_moisture }},
+                    {{ sensor_data.field_temperature }},
+                    {{ sensor_data.field_humidity }},
+                    {{ sensor_data.soil_ph }}
+                ],
+                backgroundColor: [
+                    'rgba(76, 175, 80, 0.75)',
+                    'rgba(255, 193, 7, 0.75)',
+                    'rgba(33, 150, 243, 0.75)',
+                    'rgba(156, 204, 101, 0.75)'
+                ],
+                borderColor: [
+                    '#2e7d32',
+                    '#f9a825',
+                    '#1565c0',
+                    '#558b2f'
+                ],
+                borderWidth: 2,
+                borderRadius: 12,
+                borderSkipped: false,
+                hoverBackgroundColor: [
+                    'rgba(76, 175, 80, 0.95)',
+                    'rgba(255, 193, 7, 0.95)',
+                    'rgba(33, 150, 243, 0.95)',
+                    'rgba(156, 204, 101, 0.95)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1200,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#1f5a3f',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        boxWidth: 22,
+                        boxHeight: 12
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(20, 40, 30, 0.95)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#f1f8e9',
+                    borderColor: '#d9b44a',
+                    borderWidth: 1,
+                    cornerRadius: 10,
+                    padding: 12
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(31, 90, 63, 0.10)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#1f5a3f',
+                        font: {
+                            size: 13,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(31, 90, 63, 0.12)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#1f5a3f',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

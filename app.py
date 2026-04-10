@@ -189,7 +189,7 @@ def analyzer():
                         "irrigation": irrigation,
                         "disease": disease,
                         "fertilizer": fertilizer,
-                        "alert": alert
+                        "alert": alert,
                         "sensor_data": latest_sensor_data,
                         "sensor_advice": sensor_advice
                     }
@@ -388,23 +388,323 @@ def sensors():
     sensor_advice = []
 
     if request.method == "POST":
-        latest_sensor_data["soil_moisture"] = request.form["soil_moisture"]
-        latest_sensor_data["field_temperature"] = request.form["field_temperature"]
-        latest_sensor_data["field_humidity"] = request.form["field_humidity"]
-        latest_sensor_data["rain_detected"] = request.form["rain_detected"]
-        latest_sensor_data["soil_ph"] = request.form["soil_ph"]
+        preset = request.form.get("preset")
+
+        if preset == "dry":
+            latest_sensor_data = {
+                "soil_moisture": 20,
+                "field_temperature": 37,
+                "field_humidity": 45,
+                "rain_detected": "No",
+                "soil_ph": 6.5
+            }
+
+        elif preset == "rainy":
+            latest_sensor_data = {
+                "soil_moisture": 85,
+                "field_temperature": 24,
+                "field_humidity": 88,
+                "rain_detected": "Yes",
+                "soil_ph": 6.9
+            }
+
+        elif preset == "disease":
+            latest_sensor_data = {
+                "soil_moisture": 70,
+                "field_temperature": 30,
+                "field_humidity": 92,
+                "rain_detected": "No",
+                "soil_ph": 6.7
+            }
+
+        elif preset == "healthy":
+            latest_sensor_data = {
+                "soil_moisture": 50,
+                "field_temperature": 28,
+                "field_humidity": 65,
+                "rain_detected": "No",
+                "soil_ph": 6.8
+            }
+
+        else:
+            latest_sensor_data["soil_moisture"] = request.form["soil_moisture"]
+            latest_sensor_data["field_temperature"] = request.form["field_temperature"]
+            latest_sensor_data["field_humidity"] = request.form["field_humidity"]
+            latest_sensor_data["rain_detected"] = request.form["rain_detected"]
+            latest_sensor_data["soil_ph"] = request.form["soil_ph"]
 
     sensor_advice = get_sensor_recommendation(latest_sensor_data)
+
+    def get_status_classes(sensor_data):
+        soil = float(sensor_data["soil_moisture"])
+        temp = float(sensor_data["field_temperature"])
+        humidity = float(sensor_data["field_humidity"])
+        ph = float(sensor_data["soil_ph"])
+
+        return {
+            "soil_moisture": "good" if 30 <= soil <= 75 else "bad",
+            "field_temperature": "good" if 15 <= temp <= 35 else "warning",
+            "field_humidity": "good" if humidity <= 80 else "bad",
+            "soil_ph": "good" if 5.5 <= ph <= 8 else "warning",
+            "rain_detected": "warning" if sensor_data["rain_detected"] == "Yes" else "good"
+        }
+
+    status_classes = get_status_classes(latest_sensor_data)
 
     return render_template(
         "sensors.html",
         sensor_data=latest_sensor_data,
-        sensor_advice=sensor_advice
+        sensor_advice=sensor_advice,
+        status_classes=status_classes
     )
 
 @app.route("/store")
 def store():
-    return render_template("store.html")
+    store_catalog = [
+        {
+            "category": "Pressure Sprayers",
+            "summary": "Best for spraying foliar nutrients, pesticides, and water on small garden plots.",
+            "items": [
+                {
+                    "name": "IFFCO Urban Gardens 2L Pressure Sprayer",
+                    "site": "Amazon India",
+                    "price": 429,
+                    "rating": 4.2,
+                    "reviews": 78,
+                    "trust": 4.7,
+                    "tag": "Reliable overall",
+                    "notes": "Strong overall balance of trust, usability, and price.",
+                    "url": "https://www.amazon.in/IFFCO-Urban-Gardens-Gardening-Multipurpose/dp/B0DFCH33PD"
+                },
+                {
+                    "name": "KisanKraft KK-PS2000 2L Sprayer",
+                    "site": "Amazon India",
+                    "price": 284,
+                    "rating": 3.9,
+                    "reviews": 50,
+                    "trust": 4.4,
+                    "tag": "Budget pick",
+                    "notes": "Lowest price option. Good if budget matters most.",
+                    "url": "https://www.amazon.in/Kisan-Kraft-KK-PS2000-Manual-Sprayer/dp/B01BLFFE5I"
+                },
+                {
+                    "name": "TrustBasket Premium Pressure Sprayer 2L",
+                    "site": "Amazon India",
+                    "price": 399,
+                    "rating": 4.1,
+                    "reviews": 1258,
+                    "trust": 4.3,
+                    "tag": "Review-heavy",
+                    "notes": "Large review volume helps confidence, though quality feedback is mixed.",
+                    "url": "https://www.amazon.in/TrustBasket-Premium-Pressure-Sprayer-Gardening/dp/B0CT3J483K"
+                }
+            ]
+        },
+        {
+            "category": "Watering Cans",
+            "summary": "Useful for controlled watering of seedlings, potted crops, and nursery plants.",
+            "items": [
+                {
+                    "name": "Garden Craft 5L Watering Can",
+                    "site": "Flipkart",
+                    "price": 258,
+                    "rating": 4.4,
+                    "reviews": 622,
+                    "trust": 4.3,
+                    "tag": "Best value",
+                    "notes": "Best value combination of price and rating.",
+                    "url": "https://www.flipkart.com/garden-craft-plastic-watering-can-water-sprayer-sprinkler-plants-indoor-outdoor-gardening-5-litre-with-trowel-l-tank/p/itm5c975b4a6e602"
+                },
+                {
+                    "name": "Jardin 5L Watering Can",
+                    "site": "Flipkart",
+                    "price": 399,
+                    "rating": 4.2,
+                    "reviews": 982,
+                    "trust": 4.3,
+                    "tag": "Popular option",
+                    "notes": "More review volume, but noticeably pricier.",
+                    "url": "https://www.flipkart.com/jardin-plastic-watering-can-water-sprayer-sprinkler-plants-indoor-outdoor-gardening-5-ltr-l-cane/p/itm7c9abd5bcb762"
+                }
+            ]
+        },
+        {
+            "category": "Pruning Tools",
+            "summary": "For trimming leaves, branches, and plant damage quickly and neatly.",
+            "items": [
+                {
+                    "name": "Sharpex / Urbain Green Bypass Pruner",
+                    "site": "Amazon India",
+                    "price": 504,
+                    "rating": 4.5,
+                    "reviews": 62,
+                    "trust": 4.4,
+                    "tag": "Best rated",
+                    "notes": "Highest visible rating in this short list.",
+                    "url": "https://www.amazon.in/Heavy-Duty-Pruning-Gardening-Coating-Secateurs/dp/B0DHCW64D4"
+                },
+                {
+                    "name": "IFFCO Urban Gardens Bypass Pruner",
+                    "site": "IFFCO Urban Gardens",
+                    "price": 499,
+                    "rating": 4.0,
+                    "reviews": 70,
+                    "trust": 4.8,
+                    "tag": "Brand-direct",
+                    "notes": "Best if you prefer buying directly from an established gardening brand.",
+                    "url": "https://iffcourbangardens.com/products/bypass-pruner-heavy-duty"
+                }
+            ]
+        },
+        {
+            "category": "Organic Fertilizers / Vermicompost",
+            "summary": "Good for soil health, steady nutrition, and safer long-term plant feeding.",
+            "items": [
+                {
+                    "name": "IFFCO Urban Gardens Nutri-Rich Vermicompost",
+                    "site": "IFFCO Urban Gardens",
+                    "price": 899,
+                    "rating": 4.76,
+                    "reviews": 115,
+                    "trust": 4.9,
+                    "tag": "Premium organic choice",
+                    "notes": "Strong trust score and clearly visible review support from the brand store.",
+                    "url": "https://iffcourbangardens.com/products/nutri-rich-seaweed-fortified-vermicompost"
+                },
+                {
+                    "name": "India Gardening Organic Vermicompost",
+                    "site": "Amazon India",
+                    "price": 499,
+                    "rating": 4.2,
+                    "reviews": 100,
+                    "trust": 4.4,
+                    "tag": "Affordable organic",
+                    "notes": "Lower entry price and positive review snippet.",
+                    "url": "https://www.amazon.in/India-Gardening-Organic-Vermicompost-Fertilizer/dp/B0B4W6YR2Z"
+                },
+                {
+                    "name": "UmaMhaesh Vermicompost 5Kg",
+                    "site": "Amazon India",
+                    "price": 399,
+                    "rating": 3.4,
+                    "reviews": 59,
+                    "trust": 4.2,
+                    "tag": "Budget organic",
+                    "notes": "Cheaper, but weaker rating makes it a lower-confidence buy.",
+                    "url": "https://www.amazon.in/UmaMhaesh-Organic-Vermicompost-Fertilizer-Gardening/dp/B0DL4CTSGX"
+                }
+            ]
+        },
+        {
+            "category": "Balanced NPK Fertilizers",
+            "summary": "Useful when you want all-round nutrient support rather than a single-nutrient feed.",
+            "items": [
+                {
+                    "name": "Go Garden NPK 19-19-19",
+                    "site": "Amazon India",
+                    "price": 299,
+                    "rating": 4.3,
+                    "reviews": 100,
+                    "trust": 4.4,
+                    "tag": "Best buy",
+                    "notes": "Positive review summary and balanced overall value.",
+                    "url": "https://www.amazon.in/Go-Garden-19-Fertilizer-Gardening/dp/B0C5JWLJ8P"
+                },
+                {
+                    "name": "SJ Organics NPK 19-19-19",
+                    "site": "Amazon India",
+                    "price": 349,
+                    "rating": 4.2,
+                    "reviews": 60,
+                    "trust": 4.3,
+                    "tag": "Good value",
+                    "notes": "Positive quality and value commentary in reviews.",
+                    "url": "https://www.amazon.in/Organics-NPK-Fertilizer-Water-Soluble-Flowering/dp/B0FH23L663"
+                },
+                {
+                    "name": "Utkarsh NPK 19-19-19",
+                    "site": "Amazon India",
+                    "price": 399,
+                    "rating": 4.1,
+                    "reviews": 50,
+                    "trust": 4.4,
+                    "tag": "Trusted brand",
+                    "notes": "Slightly pricier but still credible for general use.",
+                    "url": "https://www.amazon.in/Utkarsh-NPK-Speciality-Crystalline-Fertilizer/dp/B07MQ194LJ"
+                }
+            ]
+        },
+        {
+            "category": "Seed Bundles",
+            "summary": "Useful starter packs for kitchen gardens, balcony farms, and demo seed kits.",
+            "items": [
+                {
+                    "name": "UGAOO Indian Vegetable Seeds Bank",
+                    "site": "Amazon India",
+                    "price": 199,
+                    "rating": 3.8,
+                    "reviews": 1026,
+                    "trust": 4.5,
+                    "tag": "Best value bundle",
+                    "notes": "Very attractive price and strong review volume.",
+                    "url": "https://www.amazon.in/UGAOO-Indian-Vegetable-Garden-Varieties/dp/B09MLPKZ1T"
+                },
+                {
+                    "name": "UGAOO Indian Vegetable Seeds Bundle",
+                    "site": "Flipkart",
+                    "price": 399,
+                    "rating": 4.0,
+                    "reviews": 11,
+                    "trust": 4.3,
+                    "tag": "Higher-rated listing",
+                    "notes": "Higher displayed rating but far fewer reviews than the Amazon listing.",
+                    "url": "https://www.flipkart.com/q/vegetable-seeds"
+                },
+                {
+                    "name": "SeedBasket Native Vegetable Combo Pack",
+                    "site": "Amazon India",
+                    "price": 249,
+                    "rating": 4.0,
+                    "reviews": 80,
+                    "trust": 4.4,
+                    "tag": "Native crops combo",
+                    "notes": "Good if you want a smaller curated combo instead of a huge bundle.",
+                    "url": "https://www.amazon.in/stores/SeedBasket/page/6C20F96C-5CFE-45DB-A74A-4C95C7899207"
+                }
+            ]
+        }
+    ]
+
+    # AI-style scoring
+    for group in store_catalog:
+        prices = [item["price"] for item in group["items"]]
+        min_price = min(prices)
+        max_price = max(prices)
+
+        for item in group["items"]:
+            if max_price == min_price:
+                price_score = 5
+            else:
+                # lower price = higher score
+                price_score = 5 - ((item["price"] - min_price) / (max_price - min_price)) * 2
+
+            rating_score = item["rating"]
+            review_score = min(item["reviews"] / 300, 1.0) * 5
+            trust_score = item["trust"]
+
+            item["ai_score"] = round(
+                (price_score * 0.25) +
+                (rating_score * 0.35) +
+                (review_score * 0.15) +
+                (trust_score * 0.25),
+                2
+            )
+
+        best_name = max(group["items"], key=lambda x: x["ai_score"])["name"]
+        for item in group["items"]:
+            item["is_best"] = item["name"] == best_name
+
+    return render_template("store.html", store_catalog=store_catalog)
 
 if __name__ == "__main__":
     app.run(debug=True)

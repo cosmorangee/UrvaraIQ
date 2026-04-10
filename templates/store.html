@@ -4,78 +4,94 @@
 <section class="page-section">
     <div class="page-overlay"></div>
 
-    <div class="content-box store-box">
-        <h1 class="page-title">SMART AGRICULTURE STORE</h1>
-        <p class="page-subtitle">Tools, fertilizers, and essentials for modern farming.</p>
-
-        <div class="store-container">
-            <div class="products">
-                <div class="product-card">
-                    <h3>Shovel</h3>
-                    <p>₹500</p>
-                    <button onclick="addToCart('Shovel', 500)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Hoe</h3>
-                    <p>₹450</p>
-                    <button onclick="addToCart('Hoe', 450)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Watering Can</h3>
-                    <p>₹300</p>
-                    <button onclick="addToCart('Watering Can', 300)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Sprayer</h3>
-                    <p>₹1200</p>
-                    <button onclick="addToCart('Sprayer', 1200)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Urea Fertilizer</h3>
-                    <p>₹800</p>
-                    <button onclick="addToCart('Urea Fertilizer', 800)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>DAP Fertilizer</h3>
-                    <p>₹750</p>
-                    <button onclick="addToCart('DAP Fertilizer', 750)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Organic Compost</h3>
-                    <p>₹600</p>
-                    <button onclick="addToCart('Organic Compost', 600)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Seeds Pack</h3>
-                    <p>₹200</p>
-                    <button onclick="addToCart('Seeds Pack', 200)">Add</button>
-                </div>
-
-                <div class="product-card">
-                    <h3>Oil Cake</h3>
-                    <p>₹400</p>
-                    <button onclick="addToCart('Oil Cake', 400)">Add</button>
-                </div>
-            </div>
-
-            <div class="cart-panel">
-                <h3>🛒 Shopping Cart</h3>
-                <ul id="cartItems"></ul>
-
-                <div class="total">
-                    Total: ₹<span id="total">0</span>
-                </div>
-
-                <button onclick="checkout()">Proceed to Payment</button>
+    <div class="content-box premium-store-box">
+        <div class="store-hero reveal">
+            <div class="store-hero-text">
+                <p class="store-kicker">SMART MARKETPLACE</p>
+                <h1 class="page-title">AI FARM STORE</h1>
+                <p class="page-subtitle">
+                    Compare trusted tools, fertilizers, and seeds from real shopping sites.
+                    We rank options using price, review signals, and seller trust.
+                </p>
             </div>
         </div>
+
+        <div class="store-summary-row reveal">
+            <div class="store-summary-card">
+                <h3>🔎 AI Comparison</h3>
+                <p>Scores products on price, ratings, review volume, and retailer trust.</p>
+            </div>
+            <div class="store-summary-card">
+                <h3>🛒 Legit Sellers</h3>
+                <p>Links point to large marketplaces or brand-direct stores.</p>
+            </div>
+            <div class="store-summary-card">
+                <h3>🌱 Farmer Friendly</h3>
+                <p>Seed, fertilizer, and tool categories organized for quick buying decisions.</p>
+            </div>
+        </div>
+
+        {% for group in store_catalog %}
+<section class="store-section reveal">
+    <div class="store-section-header">
+        <div>
+            <p class="store-category-label">CATEGORY</p>
+            <h2>{{ group["category"] }}</h2>
+        </div>
+        <div class="store-section-copy">
+            <p>{{ group["summary"] }}</p>
+        </div>
+    </div>
+
+    <div class="premium-products-grid">
+        {% for item in group["items"] %}
+        <article class="premium-product-card {% if item["is_best"] %}best-choice{% endif %}">
+            {% if item["is_best"] %}
+            <div class="best-pill">BEST BUY</div>
+            {% endif %}
+
+            <div class="product-top">
+                <div>
+                    <p class="product-site">{{ item["site"] }}</p>
+                    <h3>{{ item["name"] }}</h3>
+                </div>
+                <span class="product-tag">{{ item["tag"] }}</span>
+            </div>
+
+            <div class="price-row">
+                <span class="price-label">Price</span>
+                <span class="price-value">₹{{ item["price"] }}</span>
+            </div>
+
+            <div class="score-grid">
+                <div class="mini-metric">
+                    <span class="metric-label">Rating</span>
+                    <span class="metric-value">{{ item["rating"] }}/5</span>
+                </div>
+                <div class="mini-metric">
+                    <span class="metric-label">Reviews</span>
+                    <span class="metric-value">{{ item["reviews"] }}</span>
+                </div>
+                <div class="mini-metric">
+                    <span class="metric-label">Trust</span>
+                    <span class="metric-value">{{ item["trust"] }}/5</span>
+                </div>
+                <div class="mini-metric ai-score-box">
+                    <span class="metric-label">AI Score</span>
+                    <span class="metric-value">{{ item["ai_score"] }}/5</span>
+                </div>
+            </div>
+
+            <p class="product-note">{{ item["notes"] }}</p>
+
+            <a href="{{ item["url"] }}" target="_blank" class="store-buy-btn">
+                View on {{ item["site"] }}
+            </a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
     </div>
 </section>
 {% endblock %}
