@@ -3,8 +3,51 @@ import requests
 
 app = Flask(__name__)
 
+latest_sensor_data = {
+    "soil_moisture": 45,
+    "field_temperature": 30,
+    "field_humidity": 70,
+    "rain_detected": "No",
+    "soil_ph": 6.8
+}
+
 API_KEY = "36370ec06147479a4eaba85f29ceef1d"
 
+def get_sensor_recommendation(sensor_data):
+    advice = []
+
+    soil_moisture = float(sensor_data.get("soil_moisture", 0))
+    field_temperature = float(sensor_data.get("field_temperature", 0))
+    field_humidity = float(sensor_data.get("field_humidity", 0))
+    rain_detected = sensor_data.get("rain_detected", "No")
+    soil_ph = float(sensor_data.get("soil_ph", 7))
+
+    if soil_moisture < 30:
+        advice.append("Soil moisture is low. Irrigation is needed soon.")
+    elif soil_moisture > 75:
+        advice.append("Soil is already very wet. Avoid irrigation to prevent waterlogging.")
+    else:
+        advice.append("Soil moisture is in a moderate range.")
+
+    if field_temperature > 35:
+        advice.append("Field temperature is high. Irrigate during early morning or evening.")
+    elif field_temperature < 15:
+        advice.append("Temperature is low. Crop growth may slow down.")
+
+    if field_humidity > 80:
+        advice.append("High field humidity detected. There is increased fungal disease risk.")
+
+    if rain_detected == "Yes":
+        advice.append("Rain is detected. Delay irrigation and check field drainage.")
+
+    if soil_ph < 5.5:
+        advice.append("Soil appears acidic. Consider pH correction before fertilizer planning.")
+    elif soil_ph > 8:
+        advice.append("Soil appears alkaline. Nutrient absorption may be affected.")
+    else:
+        advice.append("Soil pH is in a generally acceptable range.")
+
+    return advice
 
 def get_coordinates(place):
     url = "http://api.openweathermap.org/geo/1.0/direct"
@@ -126,7 +169,11 @@ def analyzer():
                 if weather_error:
                     error = weather_error
                 else:
+                    # Weather-based recommendation
                     irrigation, disease, fertilizer, alert = get_recommendation(temp, humidity)
+
+                    # NEW: Sensor-based recommendation
+                    sensor_advice = get_sensor_recommendation(latest_sensor_data)
 
                     result = {
                         "place": display_name,
@@ -143,6 +190,8 @@ def analyzer():
                         "disease": disease,
                         "fertilizer": fertilizer,
                         "alert": alert
+                        "sensor_data": latest_sensor_data,
+                        "sensor_advice": sensor_advice
                     }
 
         else:
@@ -332,6 +381,26 @@ def alerts():
         "Efficient irrigation can save water and improve yield."
     ]
     return render_template("alerts.html", alerts=sample_alerts)
+
+@app.route("/sensors", methods=["GET", "POST"])
+def sensors():
+    global latest_sensor_data
+    sensor_advice = []
+
+    if request.method == "POST":
+        latest_sensor_data["soil_moisture"] = request.form["soil_moisture"]
+        latest_sensor_data["field_temperature"] = request.form["field_temperature"]
+        latest_sensor_data["field_humidity"] = request.form["field_humidity"]
+        latest_sensor_data["rain_detected"] = request.form["rain_detected"]
+        latest_sensor_data["soil_ph"] = request.form["soil_ph"]
+
+    sensor_advice = get_sensor_recommendation(latest_sensor_data)
+
+    return render_template(
+        "sensors.html",
+        sensor_data=latest_sensor_data,
+        sensor_advice=sensor_advice
+    )
 
 @app.route("/store")
 def store():

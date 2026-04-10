@@ -99,5 +99,16 @@
         </div>
         {% endif %}
     </div>
+    <div class="chat-box" style="margin-top: 25px;">
+    <h3>📡 Sensor-Based Insights</h3>
+
+    {% if result.sensor_advice %}
+        <div style="text-align:left; margin-top:10px;">
+            {% for tip in result.sensor_advice %}
+                <p>• {{ tip }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 </section>
 {% endblock %}
