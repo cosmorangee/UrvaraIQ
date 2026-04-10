@@ -9,23 +9,23 @@
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="logo">
-    <span class="logo-icon">🌿</span>
-    <span class="logo-text">UrvaraIQ</span>
-</div>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('home') }}">HOME</a></li>
-            <li><a href="{{ url_for('analyzer') }}">ANALYZER</a></li>
-            <li><a href="{{ url_for('sensors') }}">SENSORS</a></li>
-            <li><a href="{{ url_for('assistant') }}">ASSISTANT</a></li>
-            <li><a href="{{ url_for('alerts') }}">ALERTS</a></li>
-            <li><a href="{{ url_for('store') }}">STORE</a></li>
-            <li><a href="{{ url_for('about') }}">ABOUT</a></li>
-        </ul>
-        <div id="google_translate_element"></div>
-        <a href="{{ url_for('assistant') }}" class="nav-btn">GET IN TOUCH</a>
-    </nav>
+   <nav class="navbar">
+    <div class="logo">
+        <span class="logo-icon">🌿</span>
+    </div>
+
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+    <ul class="nav-links" id="mobileMenu">
+        <li><a href="{{ url_for('home') }}">HOME</a></li>
+        <li><a href="{{ url_for('analyzer') }}">ANALYZER</a></li>
+        <li><a href="{{ url_for('sensors') }}">SENSORS</a></li>
+        <li><a href="{{ url_for('assistant') }}">ASSISTANT</a></li>
+        <li><a href="{{ url_for('alerts') }}">ALERTS</a></li>
+        <li><a href="{{ url_for('store') }}">STORE</a></li>
+        <li><a href="{{ url_for('about') }}">ABOUT</a></li>
+    </ul>
+</nav>
 
     {% block content %}{% endblock %}
     
