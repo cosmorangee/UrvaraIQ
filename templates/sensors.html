@@ -28,6 +28,10 @@
                 <input type="hidden" name="preset" value="healthy">
                 <button type="submit">Healthy Field</button>
             </form>
+
+            <form onsubmit="startSimulation(event)">
+    <button type="submit">Start Live Simulation</button>
+</form>
         </div>
 
         <form method="POST" class="sensor-form">
@@ -66,27 +70,39 @@
             </div>
         </form>
 
-        <div class="result-card sensor-status {{ status_classes.soil_moisture }}">
-    <h3>Soil Moisture</h3>
-    <p class="counter" data-target="{{ sensor_data.soil_moisture }}">0</p>
-    <p>%</p>
-</div>
+        <div class="result-grid" style="margin-top: 30px;">
+    <div class="result-card sensor-status {{ status_classes.soil_moisture }}">
+        <h3>Soil Moisture</h3>
+        <p class="counter" id="soil_moisture_value" data-target="{{ sensor_data.soil_moisture }}">0</p>
+        <p>%</p>
+    </div>
 
-<div class="result-card sensor-status {{ status_classes.field_temperature }}">
-    <h3>Field Temperature</h3>
-    <p class="counter" data-target="{{ sensor_data.field_temperature }}">0</p>
-    <p>°C</p>
-</div>
+    <div class="result-card sensor-status {{ status_classes.field_temperature }}">
+        <h3>Field Temperature</h3>
+        <p class="counter" id="field_temperature_value" data-target="{{ sensor_data.field_temperature }}">0</p>
+        <p>°C</p>
+    </div>
 
-<div class="result-card sensor-status {{ status_classes.field_humidity }}">
-    <h3>Field Humidity</h3>
-    <p class="counter" data-target="{{ sensor_data.field_humidity }}">0</p>
-    <p>%</p>
-</div>
+    <div class="result-card sensor-status {{ status_classes.field_humidity }}">
+        <h3>Field Humidity</h3>
+        <p class="counter" id="field_humidity_value" data-target="{{ sensor_data.field_humidity }}">0</p>
+        <p>%</p>
+    </div>
 
-<div class="result-card sensor-status {{ status_classes.soil_ph }}">
-    <h3>Soil pH</h3>
-    <p class="counter" data-target="{{ sensor_data.soil_ph }}">0</p>
+    <div class="result-card sensor-status {{ status_classes.rain_detected }}">
+        <h3>Rain Detected</h3>
+        <p id="rain_detected_value">{{ sensor_data.rain_detected }}</p>
+    </div>
+
+    <div class="result-card sensor-status {{ status_classes.soil_ph }}">
+        <h3>Soil pH</h3>
+        <p class="counter" id="soil_ph_value" data-target="{{ sensor_data.soil_ph }}">0</p>
+    </div>
+
+    <div class="result-card">
+        <h3>Last Updated</h3>
+        <p id="last_updated_value">{{ sensor_data.last_updated }}</p>
+    </div>
 </div>
 </div>
 
@@ -111,7 +127,7 @@
 <script>
     const sensorChart = document.getElementById('sensorChart');
 
-    new Chart(sensorChart, {
+    window.sensorChartInstance = new Chart(sensorChart, {
         type: 'bar',
         data: {
             labels: ['Soil Moisture', 'Temperature', 'Humidity', 'Soil pH'],

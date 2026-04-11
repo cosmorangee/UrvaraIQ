@@ -156,3 +156,65 @@ function speakText(text) {
 
     speechSynthesis.speak(speech);
 }
+
+async function refreshSensorDashboard() {
+    try {
+        const response = await fetch("/api/sensor-data");
+        const data = await response.json();
+
+        const soil = document.getElementById("soil_moisture_value");
+        const temp = document.getElementById("field_temperature_value");
+        const humidity = document.getElementById("field_humidity_value");
+        const rain = document.getElementById("rain_detected_value");
+        const ph = document.getElementById("soil_ph_value");
+        const updated = document.getElementById("last_updated_value");
+
+        if (soil) soil.innerText = data.soil_moisture;
+        if (temp) temp.innerText = data.field_temperature;
+        if (humidity) humidity.innerText = data.field_humidity;
+        if (rain) rain.innerText = data.rain_detected;
+        if (ph) ph.innerText = data.soil_ph;
+        if (updated) updated.innerText = data.last_updated;
+
+        // Optional chart update
+        if (window.sensorChartInstance) {
+            window.sensorChartInstance.data.datasets[0].data = [
+                Number(data.soil_moisture),
+                Number(data.field_temperature),
+                Number(data.field_humidity),
+                Number(data.soil_ph)
+            ];
+            window.sensorChartInstance.update();
+        }
+
+    } catch (error) {
+        console.log("Sensor refresh failed:", error);
+    }
+}
+
+// Auto-refresh every 5 seconds
+setInterval(refreshSensorDashboard, 5000);
+
+let simulationInterval = null;
+
+function startSimulation(event) {
+    event.preventDefault();
+
+    if (simulationInterval) return;
+
+    simulationInterval = setInterval(async () => {
+        try {
+            await fetch("/api/simulate-sensor", {
+                method: "POST"
+            });
+            refreshSensorDashboard();
+        } catch (error) {
+            console.log("Simulation error:", error);
+        }
+    }, 5000);
+}
+
+function stopSimulation() {
+    clearInterval(simulationInterval);
+    simulationInterval = null;
+}

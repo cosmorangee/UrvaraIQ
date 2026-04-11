@@ -2,6 +2,9 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify
+from datetime import datetime
+import random
 
 import requests
 from bs4 import BeautifulSoup
@@ -164,6 +167,17 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 app.secret_key = "your_secret_key_here"
 
 DATABASE = "urvaraiq.db"
+
+from datetime import datetime
+
+latest_sensor_data = {
+    "soil_moisture": 45,
+    "field_temperature": 30,
+    "field_humidity": 70,
+    "rain_detected": "No",
+    "soil_ph": 6.8,
+    "last_updated": "Just now"
+}
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
@@ -588,10 +602,11 @@ def alerts():
     ]
     return render_template("alerts.html", alerts=sample_alerts)
 
+from datetime import datetime
+
 @app.route("/sensors", methods=["GET", "POST"])
 def sensors():
     global latest_sensor_data
-    sensor_advice = []
 
     if request.method == "POST":
         preset = request.form.get("preset")
@@ -602,7 +617,8 @@ def sensors():
                 "field_temperature": 37,
                 "field_humidity": 45,
                 "rain_detected": "No",
-                "soil_ph": 6.5
+                "soil_ph": 6.5,
+                "last_updated": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
 
         elif preset == "rainy":
@@ -611,7 +627,8 @@ def sensors():
                 "field_temperature": 24,
                 "field_humidity": 88,
                 "rain_detected": "Yes",
-                "soil_ph": 6.9
+                "soil_ph": 6.9,
+                "last_updated": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
 
         elif preset == "disease":
@@ -620,7 +637,8 @@ def sensors():
                 "field_temperature": 30,
                 "field_humidity": 92,
                 "rain_detected": "No",
-                "soil_ph": 6.7
+                "soil_ph": 6.7,
+                "last_updated": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
 
         elif preset == "healthy":
@@ -629,7 +647,8 @@ def sensors():
                 "field_temperature": 28,
                 "field_humidity": 65,
                 "rain_detected": "No",
-                "soil_ph": 6.8
+                "soil_ph": 6.8,
+                "last_updated": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
 
         else:
@@ -638,8 +657,32 @@ def sensors():
             latest_sensor_data["field_humidity"] = request.form["field_humidity"]
             latest_sensor_data["rain_detected"] = request.form["rain_detected"]
             latest_sensor_data["soil_ph"] = request.form["soil_ph"]
+            latest_sensor_data["last_updated"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
     sensor_advice = get_sensor_recommendation(latest_sensor_data)
+
+    def get_status_classes(sensor_data):
+        soil = float(sensor_data["soil_moisture"])
+        temp = float(sensor_data["field_temperature"])
+        humidity = float(sensor_data["field_humidity"])
+        ph = float(sensor_data["soil_ph"])
+
+        return {
+            "soil_moisture": "good" if 30 <= soil <= 75 else "bad",
+            "field_temperature": "good" if 15 <= temp <= 35 else "warning",
+            "field_humidity": "good" if humidity <= 80 else "bad",
+            "soil_ph": "good" if 5.5 <= ph <= 8 else "warning",
+            "rain_detected": "warning" if sensor_data["rain_detected"] == "Yes" else "good"
+        }
+
+    status_classes = get_status_classes(latest_sensor_data)
+
+    return render_template(
+        "sensors.html",
+        sensor_data=latest_sensor_data,
+        sensor_advice=sensor_advice,
+        status_classes=status_classes
+    )
 
     def get_status_classes(sensor_data):
         soil = float(sensor_data["soil_moisture"])
@@ -1054,6 +1097,42 @@ def updates():
         government_updates=government_updates,
         company_updates=company_updates
     )
+
+@app.route("/api/sensor-data", methods=["POST"])
+def api_sensor_data():
+    global latest_sensor_data
+
+    try:
+        data = request.get_json()
+
+        latest_sensor_data["soil_moisture"] = data.get("soil_moisture", latest_sensor_data["soil_moisture"])
+        latest_sensor_data["field_temperature"] = data.get("field_temperature", latest_sensor_data["field_temperature"])
+        latest_sensor_data["field_humidity"] = data.get("field_humidity", latest_sensor_data["field_humidity"])
+        latest_sensor_data["rain_detected"] = data.get("rain_detected", latest_sensor_data["rain_detected"])
+        latest_sensor_data["soil_ph"] = data.get("soil_ph", latest_sensor_data["soil_ph"])
+        latest_sensor_data["last_updated"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+        return jsonify({"status": "success", "message": "Sensor data updated"}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
+    
+@app.route("/api/sensor-data", methods=["GET"])
+def get_sensor_data():
+    return jsonify(latest_sensor_data)
+
+@app.route("/api/simulate-sensor", methods=["POST"])
+def simulate_sensor():
+    global latest_sensor_data
+
+    latest_sensor_data["soil_moisture"] = random.randint(20, 90)
+    latest_sensor_data["field_temperature"] = random.randint(22, 40)
+    latest_sensor_data["field_humidity"] = random.randint(40, 95)
+    latest_sensor_data["rain_detected"] = random.choice(["Yes", "No"])
+    latest_sensor_data["soil_ph"] = round(random.uniform(5.5, 8.0), 1)
+    latest_sensor_data["last_updated"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+    return jsonify({"status": "success", "data": latest_sensor_data})
 
 init_db()
 
