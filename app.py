@@ -1,7 +1,213 @@
-from flask import Flask, render_template, request
-import requests
+import os
+import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
+import requests
+from bs4 import BeautifulSoup
+
+
+def fetch_page(url):
+    try:
+        response = requests.get(
+            url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=10
+        )
+        if response.status_code == 200:
+            return response.text
+    except Exception:
+        pass
+    return None
+
+
+def parse_pm_kisan():
+    url = "https://pmkisan.gov.in/"
+    html = fetch_page(url)
+    if not html:
+        return {
+            "title": "PM-KISAN",
+            "summary": "Could not fetch latest details right now.",
+            "link": url,
+            "type": "government"
+        }
+
+    soup = BeautifulSoup(html, "html.parser")
+    text = soup.get_text(" ", strip=True)
+
+    summary = "Official PM-KISAN scheme portal."
+    if "6,000" in text:
+        summary = "PM-KISAN provides ₹6,000 per year in three installments to eligible farmer families."
+
+    return {
+        "title": "PM-KISAN",
+        "summary": summary,
+        "link": url,
+        "type": "government"
+    }
+
+
+def parse_nhb():
+    url = "https://nhb.gov.in/schemes.aspx"
+    html = fetch_page(url)
+    summary = "Official horticulture schemes and subsidy information."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text(" ", strip=True)
+        if "scheme" in text.lower() or "subsidy" in text.lower():
+            summary = "NHB publishes horticulture schemes, subsidy guidance, and scheme application information."
+
+    return {
+        "title": "National Horticulture Board",
+        "summary": summary,
+        "link": url,
+        "type": "government"
+    }
+
+
+def parse_nfsm():
+    url = "https://www.nfsm.gov.in/circulars.aspx"
+    html = fetch_page(url)
+    summary = "Official NFSM circulars and scheme notices."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        rows = soup.find_all("tr")
+        latest_note = None
+        for row in rows:
+            row_text = row.get_text(" ", strip=True)
+            if row_text and "NFSM" in row_text:
+                latest_note = row_text[:180]
+                break
+        if latest_note:
+            summary = latest_note
+
+    return {
+        "title": "NFSM Circulars",
+        "summary": summary,
+        "link": url,
+        "type": "government"
+    }
+
+
+def parse_nmsa():
+    url = "https://nmsa.dac.gov.in/"
+    html = fetch_page(url)
+    summary = "Official sustainable agriculture mission updates."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text(" ", strip=True)
+        if "soil health" in text.lower() or "water use efficiency" in text.lower():
+            summary = "NMSA supports soil health, water-use efficiency, and climate-resilient agriculture."
+
+    return {
+        "title": "NMSA",
+        "summary": summary,
+        "link": url,
+        "type": "government"
+    }
+
+
+def parse_iffco_discounts():
+    url = "https://iffcourbangardens.com/collections/christmas-sale"
+    html = fetch_page(url)
+    summary = "Check current gardening offers from IFFCO Urban Gardens."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text(" ", strip=True)
+        if "OFF" in text:
+            summary = "IFFCO Urban Gardens sale page currently shows multiple discounted gardening products."
+
+    return {
+        "title": "IFFCO Urban Gardens Offers",
+        "summary": summary,
+        "link": url,
+        "type": "company"
+    }
+
+
+def parse_ugaoo_seeds():
+    url = "https://www.ugaoo.com/collections/seeds"
+    html = fetch_page(url)
+    summary = "Seed deals and bundles from UGAOO."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text(" ", strip=True)
+        if "seeds" in text.lower():
+            summary = "UGAOO seeds collection includes vegetable, flower, and herb seed categories."
+
+    return {
+        "title": "UGAOO Seeds",
+        "summary": summary,
+        "link": url,
+        "type": "company"
+    }
+
+
+def parse_ugaoo_fertilizers():
+    url = "https://www.ugaoo.com/collections/soil-manure"
+    html = fetch_page(url)
+    summary = "Fertilizer and manure collection from UGAOO."
+    if html:
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text(" ", strip=True)
+        if "fertilizer" in text.lower() or "manure" in text.lower():
+            summary = "UGAOO fertilizer/manure collection highlights plant nutrition products and top-rated options."
+
+    return {
+        "title": "UGAOO Fertilizers",
+        "summary": summary,
+        "link": url,
+        "type": "company"
+    }
+
+app = Flask(__name__, template_folder="templates", static_folder="static")
+app.secret_key = "your_secret_key_here"
+
+DATABASE = "urvaraiq.db"
+
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS forum_posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS forum_replies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (post_id) REFERENCES forum_posts (id),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
 
 latest_sensor_data = {
     "soil_moisture": 45,
@@ -458,6 +664,128 @@ def sensors():
         status_classes=status_classes
     )
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        email = request.form["email"].strip()
+        password = request.form["password"]
+
+        hashed_password = generate_password_hash(password)
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        try:
+            cur.execute(
+                "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+                (username, email, hashed_password)
+            )
+            conn.commit()
+            flash("Account created successfully. Please sign in.", "success")
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            flash("Username or email already exists.", "error")
+        finally:
+            conn.close()
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form["email"].strip()
+        password = request.form["password"]
+
+        conn = get_db_connection()
+        user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        conn.close()
+
+        if user and check_password_hash(user["password"], password):
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            flash("Logged in successfully.", "success")
+            return redirect(url_for("home"))
+        else:
+            flash("Invalid email or password.", "error")
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out successfully.", "success")
+    return redirect(url_for("home"))
+
+@app.route("/forum")
+def forum():
+    conn = get_db_connection()
+
+    posts = conn.execute("""
+        SELECT forum_posts.*, users.username
+        FROM forum_posts
+        JOIN users ON forum_posts.user_id = users.id
+        ORDER BY forum_posts.created_at DESC
+    """).fetchall()
+
+    forum_data = []
+
+    for post in posts:
+        replies = conn.execute("""
+            SELECT forum_replies.*, users.username
+            FROM forum_replies
+            JOIN users ON forum_replies.user_id = users.id
+            WHERE forum_replies.post_id = ?
+            ORDER BY forum_replies.created_at ASC
+        """, (post["id"],)).fetchall()
+
+        forum_data.append({
+            "post": post,
+            "replies": replies
+        })
+
+    conn.close()
+    return render_template("forum.html", forum_data=forum_data)
+
+@app.route("/forum/post", methods=["POST"])
+def create_post():
+    if "user_id" not in session:
+        flash("Please sign in to ask a question.", "error")
+        return redirect(url_for("login"))
+
+    title = request.form["title"].strip()
+    content = request.form["content"].strip()
+
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO forum_posts (user_id, title, content) VALUES (?, ?, ?)",
+        (session["user_id"], title, content)
+    )
+    conn.commit()
+    conn.close()
+
+    flash("Question posted successfully.", "success")
+    return redirect(url_for("forum"))
+
+@app.route("/forum/reply/<int:post_id>", methods=["POST"])
+def reply_post(post_id):
+    if "user_id" not in session:
+        flash("Please sign in to reply.", "error")
+        return redirect(url_for("login"))
+
+    content = request.form["content"].strip()
+
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO forum_replies (post_id, user_id, content) VALUES (?, ?, ?)",
+        (post_id, session["user_id"], content)
+    )
+    conn.commit()
+    conn.close()
+
+    flash("Reply added successfully.", "success")
+    return redirect(url_for("forum"))
+
 @app.route("/store")
 def store():
     store_catalog = [
@@ -705,6 +1033,29 @@ def store():
             item["is_best"] = item["name"] == best_name
 
     return render_template("store.html", store_catalog=store_catalog)
+
+@app.route("/updates")
+def updates():
+    government_updates = [
+        parse_pm_kisan(),
+        parse_nhb(),
+        parse_nfsm(),
+        parse_nmsa()
+    ]
+
+    company_updates = [
+        parse_iffco_discounts(),
+        parse_ugaoo_seeds(),
+        parse_ugaoo_fertilizers()
+    ]
+
+    return render_template(
+        "updates.html",
+        government_updates=government_updates,
+        company_updates=company_updates
+    )
+
+init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -129,3 +129,30 @@ function toggleMenu() {
     const menu = document.getElementById("mobileMenu");
     menu.classList.toggle("show-menu");
 }
+
+function startVoice() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = navigator.language || 'en-US';
+    recognition.start();
+
+    recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("chatInput").value = transcript;
+    };
+
+    recognition.onerror = function () {
+        alert("Voice recognition failed. Try again.");
+    };
+}
+
+function speakText(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+
+    // 🌍 match language
+    speech.lang = navigator.language || 'en-US';
+
+    speech.rate = 1;
+    speech.pitch = 1;
+
+    speechSynthesis.speak(speech);
+}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box premium-store-box">
+        <h1 class="page-title">FARMER FORUM</h1>
+        <p class="page-subtitle">Ask questions, share solutions, and help other farmers.</p>
+
+        {% if session.get("username") %}
+        <div class="forum-ask-box reveal">
+            <h3>Ask a Question</h3>
+            <form method="POST" action="{{ url_for('create_post') }}" class="forum-form">
+                <input type="text" name="title" placeholder="Question title" required>
+                <textarea name="content" placeholder="Describe your issue or question..." rows="5" required></textarea>
+                <button type="submit">POST QUESTION</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="chat-box reveal">
+            <h3>Want to ask or answer?</h3>
+            <p>Please sign in first to participate in the forum.</p>
+        </div>
+        {% endif %}
+
+        <div class="forum-list">
+            {% for item in forum_data %}
+            <div class="forum-post-card reveal">
+                <div class="forum-post-header">
+                    <h2>{{ item.post["title"] }}</h2>
+                    <p>Posted by <strong>{{ item.post["username"] }}</strong></p>
+                </div>
+
+                <p class="forum-post-content">{{ item.post["content"] }}</p>
+
+                <div class="forum-replies">
+                    <h4>Replies</h4>
+                    {% if item.replies %}
+                        {% for reply in item.replies %}
+                        <div class="forum-reply">
+                            <p>{{ reply["content"] }}</p>
+                            <span>— {{ reply["username"] }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No replies yet.</p>
+                    {% endif %}
+                </div>
+
+                {% if session.get("username") %}
+                <form method="POST" action="{{ url_for('reply_post', post_id=item.post['id']) }}" class="forum-reply-form">
+                    <textarea name="content" placeholder="Write your reply..." rows="3" required></textarea>
+                    <button type="submit">POST REPLY</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

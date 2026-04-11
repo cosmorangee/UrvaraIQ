@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box auth-box">
+        <h1 class="page-title">CREATE ACCOUNT</h1>
+        <p class="page-subtitle">Join UrvaraIQ and participate in the farming community.</p>
+
+        <form method="POST" class="auth-form">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">CREATE ACCOUNT</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

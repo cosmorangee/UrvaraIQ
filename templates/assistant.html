@@ -9,7 +9,10 @@
         <p class="page-subtitle">Ask a farming question and hear the reply.</p>
 
         <form method="POST" class="form-box">
-            <input type="text" name="chat" placeholder="Ask about irrigation, fertilizer, disease..." required>
+            <div class="voice-input-box">
+    <input type="text" name="chat" id="chatInput" placeholder="Ask something..." required>
+    <button type="button" onclick="startVoice()">🎤</button>
+</div>
             <button type="submit">ASK</button>
         </form>
 
@@ -18,7 +21,9 @@
             <h3>Assistant Reply</h3>
             <p id="chatReply">{{ chat_reply }}</p>
             <br>
-            <button onclick="speakText(document.getElementById('chatReply').innerText)">HEAR REPLY</button>
+            <button onclick="speakText(document.getElementById('chatReply').innerText)">
+    🔊 Hear Response
+</button>
         </div>
         {% endif %}
     </div>

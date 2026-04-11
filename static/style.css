@@ -1069,7 +1069,7 @@ button {
 
 .premium-products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 22px;
 }
 
@@ -1483,4 +1483,192 @@ input, select, textarea, button {
         padding: 12px 14px;
         font-size: 14px;
     }
+}
+
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-welcome {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.auth-box {
+    max-width: 600px;
+    margin: auto;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.auth-form input {
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
+
+.forum-ask-box,
+.forum-post-card {
+    background: rgba(255, 255, 255, 0.93);
+    color: #111;
+    padding: 24px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    margin-top: 24px;
+}
+
+.forum-form,
+.forum-reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.forum-form input,
+.forum-form textarea,
+.forum-reply-form textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+.forum-post-header h2 {
+    color: #1f5a3f;
+    margin-bottom: 8px;
+}
+
+.forum-post-content {
+    margin: 16px 0;
+    line-height: 1.7;
+}
+
+.forum-replies {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #ddd;
+}
+
+.forum-replies h4 {
+    margin-bottom: 12px;
+    color: #1f5a3f;
+}
+
+.forum-reply {
+    background: #f5f8f5;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.forum-reply span {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+.flash-wrapper {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.flash-message {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+}
+
+.flash-message.success {
+    background: #2e7d32;
+}
+
+.flash-message.error {
+    background: #c62828;
+}
+
+.translate-box {
+    margin-left: 15px;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+    .translate-box {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .goog-te-combo {
+        width: 90%;
+        max-width: 260px;
+    }
+}
+
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+}
+.floating-translate {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.voice-input-box {
+    display: flex;
+    gap: 10px;
+}
+
+.voice-input-box input {
+    flex: 1;
+}
+
+.voice-input-box button {
+    width: 50px;
+    font-size: 18px;
+    border-radius: 8px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .voice-input-box {
+        flex-direction: column;
+    }
+
+    .voice-input-box button {
+        width: 100%;
+    }
+}
+
+.updates-gov .product-tag {
+    background: rgba(33, 150, 243, 0.12);
+    color: #1565c0;
 }

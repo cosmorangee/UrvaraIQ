@@ -23,22 +23,59 @@
         <li><a href="{{ url_for('assistant') }}">ASSISTANT</a></li>
         <li><a href="{{ url_for('alerts') }}">ALERTS</a></li>
         <li><a href="{{ url_for('store') }}">STORE</a></li>
+        <li><a href="{{ url_for('forum') }}">FORUM</a></li>
+        <li><a href="{{ url_for('updates') }}">UPDATES</a></li>
         <li><a href="{{ url_for('about') }}">ABOUT</a></li>
     </ul>
+
+    <div id="google_translate_element" class="floating-translate"></div>
+
+
+    <div class="nav-auth">
+        {% if session.get("username") %}
+            <span class="user-welcome">Hi, {{ session.get("username") }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-btn">LOGOUT</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="nav-btn">SIGN IN</a>
+            <a href="{{ url_for('register') }}" class="nav-btn">CREATE ACCOUNT</a>
+        {% endif %}
+    </div>
 </nav>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-wrapper">
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
     {% block content %}{% endblock %}
     
-    <script type="text/javascript">
+    <script>
 function googleTranslateElementInit() {
   new google.translate.TranslateElement(
     {
       pageLanguage: 'en',
-      includedLanguages: 'en,hi,ta,te,bn,gu,ml,kn,pa,mr,ur,fr,es,de,zh',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      autoDisplay: false
     },
     'google_translate_element'
   );
+
+  // 🌍 Auto detect user language
+  const userLang = navigator.language || navigator.userLanguage;
+
+  // Wait for widget to load
+  setTimeout(() => {
+    const select = document.querySelector(".goog-te-combo");
+    if (select && userLang) {
+      select.value = userLang.substring(0, 2);
+      select.dispatchEvent(new Event('change'));
+    }
+  }, 2000);
 }
 </script>
 

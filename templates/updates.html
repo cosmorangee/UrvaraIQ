@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-overlay"></div>
+
+    <div class="content-box premium-store-box">
+        <div class="store-hero reveal">
+            <div class="store-hero-text">
+                <p class="store-kicker">LIVE INFORMATION HUB</p>
+                <h1 class="page-title">LATEST SCHEMES & DISCOUNTS</h1>
+                <p class="page-subtitle">
+                    Track current government agriculture schemes and agri-brand discount pages.
+                </p>
+            </div>
+        </div>
+
+        <section class="store-section reveal">
+            <div class="store-section-header">
+                <div>
+                    <p class="store-category-label">GOVERNMENT</p>
+                    <h2>Official Schemes</h2>
+                </div>
+                <div class="store-section-copy">
+                    <p>Curated from official portals and scheme pages.</p>
+                </div>
+            </div>
+
+            <div class="premium-products-grid">
+                {% for item in government_updates %}
+                <article class="premium-product-card">
+                    <div class="product-top">
+                        <div>
+                            <p class="product-site">Government Source</p>
+                            <h3>{{ item.title }}</h3>
+                        </div>
+                        <span class="product-tag">Official</span>
+                    </div>
+
+                    <p class="product-note">{{ item.summary }}</p>
+
+                    <a href="{{ item.link }}" target="_blank" class="store-buy-btn">
+                        Open Source
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="store-section reveal">
+            <div class="store-section-header">
+                <div>
+                    <p class="store-category-label">AGRI COMPANIES</p>
+                    <h2>Latest Discounts</h2>
+                </div>
+                <div class="store-section-copy">
+                    <p>Current deal/collection pages from legitimate gardening and agri sellers.</p>
+                </div>
+            </div>
+
+            <div class="premium-products-grid">
+                {% for item in company_updates %}
+                <article class="premium-product-card best-choice">
+                    <div class="product-top">
+                        <div>
+                            <p class="product-site">Brand / Marketplace</p>
+                            <h3>{{ item.title }}</h3>
+                        </div>
+                        <span class="product-tag">Live</span>
+                    </div>
+
+                    <p class="product-note">{{ item.summary }}</p>
+
+                    <a href="{{ item.link }}" target="_blank" class="store-buy-btn">
+                        View Offer
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}
